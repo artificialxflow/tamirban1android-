@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/config/app_environment.dart';
+import '../../../core/errors/api_error.dart';
 import '../../dashboard/presentation/pages/dashboard_placeholder.dart';
 import '../../../core/di/providers.dart';
 import '../../../data/auth/auth_repository.dart';
@@ -139,16 +140,23 @@ class _LoginContentState extends State<_LoginContent> {
     } catch (error) {
       String errorMessage = 'ارسال کد ناموفق بود.';
       
-      if (error is AuthException) {
+      if (error is ApiException) {
         errorMessage = error.message;
+        // اگر خطای Connection Refused یا CORS باشد، پیام مناسب نمایش بده
+        if (error.code == ApiErrorCode.internalServerError &&
+            (error.message.contains('Connection refused') ||
+             error.message.contains('در دسترس نیست'))) {
+          if (AppConfig.enableOfflineMode) {
+            errorMessage = 'سرور در دسترس نیست. می‌توانید مستقیماً از کد تست 0000 برای ورود استفاده کنید.';
+          }
+        }
       } else {
-        // Check for specific error types
+        // Check for specific error types (fallback)
         final errorString = error.toString().toLowerCase();
         if (errorString.contains('cors') || 
             errorString.contains('connection refused') ||
             errorString.contains('connection') ||
             errorString.contains('network')) {
-          // در حالت development، اگر backend در دسترس نیست، می‌توان از کد تست استفاده کرد
           if (AppConfig.enableOfflineMode) {
             errorMessage = 'سرور در دسترس نیست. می‌توانید مستقیماً از کد تست 0000 برای ورود استفاده کنید.';
           } else {
@@ -157,13 +165,17 @@ class _LoginContentState extends State<_LoginContent> {
         }
       }
       
-      setState(() {
-        _requestMessage = errorMessage;
-      });
+      if (mounted) {
+        setState(() {
+          _requestMessage = errorMessage;
+        });
+      }
     } finally {
-      setState(() {
-        _isRequesting = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isRequesting = false;
+        });
+      }
     }
   }
 
@@ -206,9 +218,11 @@ class _LoginContentState extends State<_LoginContent> {
                await authNotifier.login(user, tokens);
              }
 
-             setState(() {
-               _verifyMessage = 'ورود موفق بود. در حال انتقال...';
-             });
+             if (mounted) {
+               setState(() {
+                 _verifyMessage = 'ورود موفق بود. در حال انتقال...';
+               });
+             }
 
              if (!mounted) return;
              await Future<void>.delayed(const Duration(milliseconds: 600));
@@ -219,14 +233,21 @@ class _LoginContentState extends State<_LoginContent> {
                ),
              );
     } catch (error) {
-      setState(() {
-        _verifyMessage =
-            error is AuthException ? error.message : 'ورود ناموفق بود.';
-      });
+      if (mounted) {
+        String errorMessage = 'ورود ناموفق بود.';
+        if (error is ApiException) {
+          errorMessage = error.message;
+        }
+        setState(() {
+          _verifyMessage = errorMessage;
+        });
+      }
     } finally {
-      setState(() {
-        _isVerifying = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isVerifying = false;
+        });
+      }
     }
   }
 

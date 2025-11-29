@@ -15,9 +15,11 @@
 ### 2. فاز راه‌اندازی پروژه Flutter
 - [x] **ایجاد پروژه Flutter پایه**  
   - [x] پروژه Flutter ایجاد شده با نام `tamirban1android`
-  - [ ] **تغییر Package Name از `com.example.tamirban1android` به `ir.tamirban.app` یا `com.tamirban.mobile`** (ضروری برای Neshan Map API Key و انتشار نهایی)
-    - [ ] تغییر `applicationId` در `android/app/build.gradle.kts`
-    - [ ] تغییر Bundle ID در iOS (در صورت نیاز)
+  - [x] **تغییر Package Name از `com.example.tamirban1android` به `ir.tamirban.app`** (ضروری برای Neshan Map API Key و انتشار نهایی)
+    - [x] تغییر `namespace` و `applicationId` در `android/app/build.gradle.kts`
+    - [x] تغییر Package در `MainActivity.kt` و جابجایی فایل به مسیر جدید (`ir/tamirban/app/`)
+    - [x] تغییر Bundle ID در iOS (`ios/Runner.xcodeproj/project.pbxproj`)
+    - [x] تغییر Bundle ID در macOS (`macos/Runner/Configs/AppInfo.xcconfig`)
     - [ ] مرجع: `flutter-implementation-guide.md` خطوط 217-220
   - [ ] تنظیم حداقل نسخه اندروید و iOS مطابق نیاز (minSdk، targetSdk) - بررسی نیازها  
 - [ ] **تنظیم زبان، RTL و فونت ایران یکان**  
@@ -77,9 +79,10 @@
   - [x] پیاده‌سازی AuthProvider با Riverpod برای مدیریت وضعیت احراز هویت (`lib/features/auth/providers/auth_provider.dart`)
   - [x] پیاده‌سازی Refresh Token Flow (اتصال به `/api/auth/refresh`) - خودکار در `ApiClient` interceptor
   - [x] مدیریت خروج (`/api/auth/logout`) و پاک کردن توکن‌ها (مرجع: `flutter-implementation-guide.md` خطوط 439-448)
-  - [x] گارد صفحات (Route Guard) بر اساس وضعیت لاگین مشابه `auth-guard.tsx` وب (`lib/features/auth/presentation/auth_guard.dart`)
+  - [x] گارد صفحات (Route Guard) بر اساس وضعیت لاگین - استفاده از GoRouter `redirect` با `refreshListenable` (مرجع: `app.dart`)
   - [x] افزودن دکمه Logout به داشبورد
-  - [x] مدیریت خودکار refresh token در `ApiClient` با queue برای جلوگیری از چند درخواست همزمان  
+  - [x] مدیریت خودکار refresh token در `ApiClient` با queue برای جلوگیری از چند درخواست همزمان
+  - [x] رفع مشکل navigation با refactoring GoRouter در `app.dart` (حذف AuthGuard widget wrapper)  
 - [ ] **مدیریت نقش‌ها و RBAC در اپ**  
   - [ ] تعریف enum نقش‌ها و permissions بر اساس `sample/lib/permissions/role-permissions.ts`  
   - [ ] نگه‌داری نقش کاربر در State (مثلاً داخل AuthProvider/Riverpod)  
@@ -94,7 +97,9 @@
 - [x] **ناوبری (Navigation)**  
   - [x] تعریف Routeهای اصلی: `/auth`, `/dashboard`, `/customers`, `/visits`, `/invoices`, `/marketers`, `/sms`, `/reports`, `/settings`  
   - [x] انتخاب Navigator: **go_router** با پشتیبانی Deep Link  
-  - [x] مدیریت Back Stack برای سناریوهای OTP، Detail Pages و Modals  
+  - [x] مدیریت Back Stack برای سناریوهای OTP، Detail Pages و Modals
+  - [x] پیاده‌سازی Route Guard با GoRouter `redirect` callback و `refreshListenable` برای واکنش به تغییرات AuthState
+  - [x] رفع مشکل `assertFailed` در Flutter Web با refactoring navigation logic  
 
 ### 6. فاز ماژول Auth UI (صفحات ورود)
 - [x] **صفحه ورود (شماره موبایل)**  
@@ -102,6 +107,9 @@
   - [x] اعتبارسنجی شماره موبایل، دکمه ارسال OTP، نمایش پیام خطا/موفقیت  
 - [x] **صفحه/Modal وارد کردن OTP**  
   - [x] ورودی OTP با یک فیلد 4 رقمی  
+  - [x] پیاده‌سازی حالت تست با کد `0000` برای offline mode
+  - [x] نمایش راهنمای کد تست در UI (زمانی که offline mode فعال است)
+  - [x] بهبود پیام‌های خطا و نمایش راهنمای استفاده از کد تست
   - [ ] تایمر اعتبار (5 دقیقه) مطابق `OTP_EXPIRATION_MINUTES` (بعداً)  
   - [x] نمایش Errorهای اعتبارسنجی از بک‌اند  
 
@@ -236,17 +244,64 @@
 
 ### 16. کارهای فوری و اولویت بالا (در حال انجام)
 
+**📊 خلاصه وضعیت فعلی (آخرین به‌روزرسانی: 2025-01-28):**
+
+✅ **کارهای تکمیل شده اخیر:**
+- رفع باگ `setState() called after dispose()` در `login_page.dart` - تمام `setState()` calls اکنون `mounted` را چک می‌کنند
+- پیاده‌سازی حالت Offline/Test Mode با کد تست `0000` برای توسعه بدون backend
+- بهبود فرمت ورودی شماره موبایل (حذف +98، فرمت خودکار 09xxxxxxxxx)
+- رفع مشکل ارسال کد (تغییر `mobile` به `phone` در API calls)
+- بهبود Error Handling و پیام‌های خطا برای Connection Refused و CORS
+- Refactoring Navigation: استفاده از GoRouter `redirect` به جای AuthGuard widget wrapper
+- استفاده از `ApiException.fromDioError()` در `AuthRepository` - حذف `AuthException` و استفاده کامل از `ApiException`
+- تغییر Package Name از `com.example.tamirban1android` به `ir.tamirban.app` - تغییر در Android, iOS, macOS و جابجایی `MainActivity.kt`
+
+⚠️ **کارهای باقی‌مانده با اولویت بالا:**
+- نصب و راه‌اندازی Neshan Map SDK (اکنون می‌توان با Package Name جدید شروع کرد)
+- به‌روزرسانی Bundle Name در پنل Neshan با Package Name جدید (`ir.tamirban.app`) اگر API Key قبلاً ساخته شده باشد
+- افزودن فونت ایران یکان (اگر فایل‌ها موجود است)
+
 - [x] **پیاده‌سازی ApiErrorCode و بهبود Error Handling**
   - [x] ایجاد `lib/core/errors/api_error.dart` با enum `ApiErrorCode` (UNAUTHORIZED, FORBIDDEN, VALIDATION_ERROR, ...)
   - [x] ایجاد کلاس `ApiException` با پشتیبانی از Dio errors
   - [x] افزودن فیلد `code` به `ApiResponse`
-  - [ ] استفاده از `ApiException.fromDioError()` در Repositoryها
-  - [ ] نمایش خطاها در UI بر اساس کد خطا
+  - [x] بهبود پیام‌های خطا برای Connection Refused و CORS errors
+  - [x] استفاده از `ApiException.fromDioError()` در `AuthRepository` (حذف `AuthException` قدیمی)
+  - [x] به‌روزرسانی `login_page.dart` برای استفاده از `ApiException`
+  - [ ] نمایش خطاها در UI بر اساس کد خطا (بهبود بیشتر پیام‌های خطا)
   - مرجع: `PROJECT_STATUS_REPORT.md` بخش "کارهای ناتمام"
 
-- [ ] **تغییر Package Name برای Neshan Map**
-  - [ ] تغییر `com.example.tamirban1android` به `ir.tamirban.app`
-  - [ ] به‌روزرسانی Bundle Name در پنل Neshan (اگر لازم باشد)
+- [x] **رفع باگ setState() called after dispose()**
+  - [x] افزودن بررسی `mounted` قبل از تمام `setState()` calls در `login_page.dart`
+  - [x] رفع خطای memory leak در `_handleRequestOtp` و `_handleVerifyOtp`
+  - مرجع: خطای console در Flutter Web
+
+- [x] **پیاده‌سازی حالت Offline/Test Mode**
+  - [x] افزودن `enableOfflineMode` به `AppConfig` (فعال برای development + web)
+  - [x] پیاده‌سازی Mock Login با کد تست `0000` در `login_page.dart`
+  - [x] نمایش پیام راهنما برای استفاده از کد تست در UI
+  - [x] بهبود پیام‌های خطا برای Connection Refused با پیشنهاد استفاده از کد تست
+  - مرجع: درخواست کاربر برای تست بدون backend
+
+- [x] **بهبود فرمت ورودی شماره موبایل**
+  - [x] حذف `+98` prefix از TextField
+  - [x] پیاده‌سازی `_IranianPhoneFormatter` برای فرمت خودکار (09xxxxxxxxx)
+  - [x] جلوگیری از ورود دو صفر در ابتدا (00)
+  - [x] محدود کردن به 11 رقم (09123456789)
+  - [x] بهبود `_normalizedPhone` getter برای handle کردن فرمت‌های مختلف ورودی
+  - مرجع: درخواست کاربر برای فرمت استاندارد
+
+- [x] **رفع مشکل ارسال کد (Backend Compatibility)**
+  - [x] تغییر فیلد `mobile` به `phone` در `AuthRepository.requestOtp` و `verifyOtp`
+  - [x] هماهنگی با ساختار API backend
+  - مرجع: خطای "Code sending was unsuccessful"
+
+- [x] **تغییر Package Name برای Neshan Map**
+  - [x] تغییر `com.example.tamirban1android` به `ir.tamirban.app`
+  - [x] به‌روزرسانی `namespace` و `applicationId` در `android/app/build.gradle.kts`
+  - [x] جابجایی `MainActivity.kt` به مسیر جدید (`ir/tamirban/app/`)
+  - [x] به‌روزرسانی Bundle ID در iOS و macOS
+  - [ ] به‌روزرسانی Bundle Name در پنل Neshan با Package Name جدید (اگر API Key قبلاً ساخته شده باشد)
   - مرجع: `NESHAN_FORM_VALUES.md`
 
 - [x] **راه‌اندازی اولیه Neshan Map SDK**
@@ -257,8 +312,10 @@
   - [ ] تنظیم AndroidManifest.xml
   - مرجع: `NESHAN_LICENSE_SETUP.md`, `flutter-implementation-guide.md` بخش "🗺️ اتصال به نقشه نشان"
 
-- [ ] **بهبود Error Handling در Repositoryها**
-  - [ ] استفاده از `ApiException.fromDioError()` در `AuthRepository`
+- [x] **بهبود Error Handling در Repositoryها**
+  - [x] استفاده از `ApiException.fromDioError()` در `AuthRepository`
+  - [x] حذف کلاس `AuthException` و استفاده کامل از `ApiException`
+  - [x] به‌روزرسانی `login_page.dart` برای استفاده از `ApiException`
   - [ ] اضافه کردن error handling در Repositoryهای بعدی (Customers, Visits, ...)
   - مرجع: `lib/core/errors/api_error.dart`
 
