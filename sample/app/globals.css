@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@import "@neshan-maps-platform/mapbox-gl/dist/NeshanMapboxGl.css";
+
+:root {
+  --font-yekan: "IRANYekan", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Helvetica Neue", sans-serif;
+}
+
+/* استفاده از فونت Vazirmatn از CDN تا زمانی که فایل‌های فونت ایران یکان واقعی اضافه شوند */
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirfont@v30.1.0/dist/woff2/Vazirmatn-Regular.woff2") format("woff2"),
+       local("Vazirmatn"), local("Tahoma"), local("Arial");
+}
+
+@font-face {
+  font-family: "IRANYekan";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirfont@v30.1.0/dist/woff2/Vazirmatn-SemiBold.woff2") format("woff2"),
+       local("Vazirmatn"), local("Tahoma Bold"), local("Arial Bold");
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    height: 100%;
+    direction: rtl;
+    font-size: 16px;
+  }
+
+  body {
+    min-height: 100%;
+    font-family: var(--font-yekan);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    color: #1e293b;
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 2vw + 1.5rem, 3rem);
+  }
+
+  h2 {
+    font-size: clamp(1.75rem, 1.2vw + 1.2rem, 2.25rem);
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 0.8vw + 1rem, 1.75rem);
+  }
+
+  h4 {
+    font-size: 1.25rem;
+  }
+
+  h5 {
+    font-size: 1.125rem;
+  }
+
+  h6 {
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 0;
+    color: #475569;
+    line-height: 1.75;
+  }
+
+  small {
+    font-size: 0.8125rem;
+    color: #64748b;
+  }
+
+  a {
+    color: #3b82f6;
+    transition: color 150ms ease-in-out;
+  }
+
+  a:hover {
+    color: #2563eb;
+  }
+
+  a:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #bfdbfe;
+  }
+}

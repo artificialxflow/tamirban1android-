@@ -1,0 +1,24 @@
+[
+  {
+    "scheduledAt": "1404/09/05 10:15",
+    "customerName": "شرکت آریا موتور",
+    "marketerName": "مینا باقری",
+    "status": "SCHEDULED",
+    "note": "نیازمند ارائه پیشنهاد مالی"
+  },
+  {
+    "scheduledAt": "1404/09/05 12:30",
+    "customerName": "نمایندگی پارسیان",
+    "marketerName": "رضا اکبری",
+    "status": "COMPLETED",
+    "note": "در انتظار تایید مدیر"
+  },
+  {
+    "scheduledAt": "1404/09/05 15:00",
+    "customerName": "فروشگاه اکسین",
+    "marketerName": "نگار فرهادی",
+    "status": "CANCELLED",
+    "note": "جلسه به فردا منتقل شد"
+  }
+]
+

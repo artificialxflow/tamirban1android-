@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تعمیربان | داشبورد نمونه</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <div>
+          <p style="font-size:0.8rem;color:#94a3b8;margin:0;">TamirBan CRM</p>
+          <h1 style="margin:0.3rem 0 0;font-size:1.8rem;">برنامه ویزیت‌ها</h1>
+          <p style="margin:0.2rem 0 0;color:#94a3b8;font-size:0.9rem;">نسخه استاتیک برای Handoff تیم اندروید</p>
+        </div>
+        <button class="btn">ثبت ویزیت جدید</button>
+      </header>
+
+      <section class="card-grid">
+        <article class="summary-card">
+          <p>ویزیت‌های امروز</p>
+          <strong>8</strong>
+          <small style="color:var(--primary-dark);">+2 نسبت به دیروز</small>
+        </article>
+        <article class="summary-card">
+          <p>ویزیت‌های تکمیل شده</p>
+          <strong>21</strong>
+          <small style="color:#16a34a;">+12٪ رشد</small>
+        </article>
+        <article class="summary-card">
+          <p>ویزیت‌های لغو شده</p>
+          <strong>3</strong>
+          <small style="color:#f97316;">نیاز به پیگیری</small>
+        </article>
+        <article class="summary-card">
+          <p>یادآوری‌های امروز</p>
+          <strong>4</strong>
+          <small style="color:#64748b;">یادداشت‌ها را بررسی کنید</small>
+        </article>
+      </section>
+
+      <section class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>تاریخ و ساعت</th>
+              <th>مشتری</th>
+              <th>بازاریاب</th>
+              <th>وضعیت</th>
+              <th>یادداشت</th>
+            </tr>
+          </thead>
+          <tbody data-handoff-visits>
+            <tr>
+              <td colspan="5" style="text-align:center;color:#94a3b8;">در حال بارگذاری...</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="empty-state">
+        <p>برای مشاهده‌ی نسخه‌های دیگر صفحه (مشتریان، فاکتورها، SMS)، همین ساختار را کپی کرده و داده‌های مربوطه را جایگذاری کنید.</p>
+      </div>
+    </div>
+  </body>
+</html>
+

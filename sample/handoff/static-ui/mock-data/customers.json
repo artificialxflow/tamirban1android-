@@ -1,0 +1,33 @@
+[
+  {
+    "code": "C-25744",
+    "name": "شرکت آرمان خودرو",
+    "marketer": "نگار فرهادی",
+    "city": "تهران",
+    "lastVisit": "1404/08/22",
+    "status": "ACTIVE",
+    "grade": "A",
+    "monthlyRevenue": 12500000
+  },
+  {
+    "code": "C-24733",
+    "name": "فروشگاه اکسین",
+    "marketer": "رضا اکبری",
+    "city": "شیراز",
+    "lastVisit": "1404/08/21",
+    "status": "PENDING",
+    "grade": "B",
+    "monthlyRevenue": 6900000
+  },
+  {
+    "code": "C-24511",
+    "name": "نمایندگی پارسیان",
+    "marketer": "مینا باقری",
+    "city": "اصفهان",
+    "lastVisit": "1404/08/19",
+    "status": "AT_RISK",
+    "grade": "C",
+    "monthlyRevenue": 4200000
+  }
+]
+

@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'core/navigation/app_router.dart';
+import 'core/theme/app_theme.dart';
+import 'features/auth/presentation/login_page.dart';
+import 'features/auth/providers/auth_provider.dart';
+import 'features/dashboard/presentation/pages/dashboard_placeholder.dart';
+
+class TamirbanApp extends ConsumerStatefulWidget {
+  const TamirbanApp({super.key});
+
+  @override
+  ConsumerState<TamirbanApp> createState() => _TamirbanAppState();
+}
+
+class _TamirbanAppState extends ConsumerState<TamirbanApp> {
+  late final GoRouter _router;
+  final _authNotifier = ValueNotifier<AuthState?>(null);
+
+  @override
+  void initState() {
+    super.initState();
+    _router = _createRouter();
+  }
+
+  @override
+  void dispose() {
+    _authNotifier.dispose();
+    super.dispose();
+  }
+
+  GoRouter _createRouter() {
+    return GoRouter(
+      initialLocation: AppRouter.login,
+      refreshListenable: _authNotifier,
+      redirect: (context, state) {
+        final authState = _authNotifier.value;
+        
+        // Don't redirect while loading or if auth state is not available
+        if (authState == null || authState.isLoading) {
+          return null;
+        }
+
+        final isAuthenticated = authState.isAuthenticated;
+        final isLoginPage = state.uri.path == AppRouter.login;
+
+        // If user is authenticated and on login page, redirect to dashboard
+        if (isAuthenticated && isLoginPage) {
+          return AppRouter.dashboard;
+        }
+
+        // If user is not authenticated and trying to access protected route
+        if (!isAuthenticated && !isLoginPage) {
+          return AppRouter.login;
+        }
+
+        // Allow navigation
+        return null;
+      },
+      routes: [
+        GoRoute(
+          path: AppRouter.login,
+          builder: (context, state) => const LoginPage(),
+        ),
+        GoRoute(
+          path: AppRouter.dashboard,
+          builder: (context, state) => const DashboardPlaceholderPage(),
+        ),
+        // Placeholder routes for other pages
+        GoRoute(
+          path: AppRouter.customers,
+          builder: (context, state) => const _PlaceholderPage(title: 'مشتریان'),
+        ),
+        GoRoute(
+          path: AppRouter.visits,
+          builder: (context, state) => const _PlaceholderPage(title: 'ویزیت‌ها'),
+        ),
+        GoRoute(
+          path: AppRouter.invoices,
+          builder: (context, state) => const _PlaceholderPage(title: 'پیش‌فاکتورها'),
+        ),
+        GoRoute(
+          path: AppRouter.marketers,
+          builder: (context, state) => const _PlaceholderPage(title: 'بازاریاب‌ها'),
+        ),
+        GoRoute(
+          path: AppRouter.sms,
+          builder: (context, state) => const _PlaceholderPage(title: 'پیامک‌ها'),
+        ),
+        GoRoute(
+          path: AppRouter.reports,
+          builder: (context, state) => const _PlaceholderPage(title: 'گزارش‌ها'),
+        ),
+        GoRoute(
+          path: AppRouter.settings,
+          builder: (context, state) => const _PlaceholderPage(title: 'تنظیمات'),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Watch auth state and update notifier
+    final authState = ref.watch(authProvider);
+    _authNotifier.value = authState;
+
+    return MaterialApp.router(
+      title: 'تعمیربان CRM',
+      debugShowCheckedModeBanner: false,
+      locale: const Locale('fa'),
+      supportedLocales: const [
+        Locale('fa'),
+        Locale('en'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      theme: AppTheme.light(),
+      routerConfig: _router,
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
+    );
+  }
+}
+
+/// Placeholder page for routes not yet implemented
+class _PlaceholderPage extends StatelessWidget {
+  const _PlaceholderPage({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.construction,
+              size: 64,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'این صفحه در حال توسعه است',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

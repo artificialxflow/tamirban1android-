@@ -1,0 +1,44 @@
+{
+  "info": {
+    "name": "TamirBan CRM",
+    "_postman_id": "placeholder-id",
+    "description": "Postman collection for TamirBan CRM API handoff",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Request OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/auth/otp/request", "host": ["{{baseUrl}}"], "path": ["api", "auth", "otp", "request"] },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"09123456789\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "List Customers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/customers?limit=20&page=1", "host": ["{{baseUrl}}"], "path": ["api", "customers"], "query": [{ "key": "limit", "value": "20" }, { "key": "page", "value": "1" }] }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "accessToken", "value": "" }
+  ]
+}
+

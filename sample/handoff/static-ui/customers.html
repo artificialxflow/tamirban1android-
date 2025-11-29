@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تعمیربان | لیست مشتریان</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+        <div>
+          <p style="font-size:0.8rem;color:#94a3b8;margin:0;">TamirBan CRM</p>
+          <h1 style="margin:0.3rem 0 0;font-size:1.8rem;">مدیریت مشتریان</h1>
+          <p style="margin:0.2rem 0 0;color:#94a3b8;font-size:0.9rem;">نمونه استاتیک برای Handoff</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="btn">افزودن مشتری جدید</button>
+        </div>
+      </header>
+
+      <section class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>شناسه</th>
+              <th>نام مشتری</th>
+              <th>بازاریاب</th>
+              <th>شهر</th>
+              <th>آخرین ویزیت</th>
+              <th>وضعیت</th>
+              <th>امتیاز</th>
+              <th>درآمد ماه جاری</th>
+            </tr>
+          </thead>
+          <tbody data-handoff-customers>
+            <tr>
+              <td colspan="8" style="text-align:center;color:#94a3b8;">در حال بارگذاری...</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="empty-state">
+        <p>در صورت نبود داده، پیام “هیچ مشتری ثبت نشده است” همراه دکمه “افزودن مشتری جدید” نمایش دهید.</p>
+      </div>
+    </div>
+  </body>
+</html>
+
