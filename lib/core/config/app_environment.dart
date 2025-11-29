@@ -45,9 +45,20 @@ class AppConfig {
     }
   }
 
-  /// Enable offline/test mode for development when backend is not available
-  /// In this mode, code '0000' can be used to login without backend
+  /// Enable offline/test mode ONLY for development when backend is not available
+  /// 
+  /// **Important:**
+  /// - ✅ Active: Only in DEVELOPMENT + WEB (for local testing without backend)
+  /// - ❌ Inactive: In PRODUCTION or MOBILE platforms (Android/iOS)
+  /// 
+  /// **When building for mobile:**
+  /// - This will always be `false`
+  /// - App will always connect to real API: `https://tamirban1.ir/api`
+  /// - No mock data or test codes will work
+  /// - Real authentication required
   static bool get enableOfflineMode {
+    // Only enable in development AND web platform
+    // In mobile (Android/iOS), this is always false - always uses production API
     return current == AppEnvironment.development && kIsWeb;
   }
 }

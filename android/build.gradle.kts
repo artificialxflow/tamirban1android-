@@ -2,6 +2,10 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // Neshan Map Repository
+        maven {
+            url = uri("https://repo.neshan.org/artifactory/public-maven")
+        }
     }
 }
 

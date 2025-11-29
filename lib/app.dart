@@ -7,7 +7,9 @@ import 'core/navigation/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/login_page.dart';
 import 'features/auth/providers/auth_provider.dart';
+import 'features/customers/presentation/pages/customers_list_page.dart';
 import 'features/dashboard/presentation/pages/dashboard_placeholder.dart';
+import 'features/visits/presentation/pages/visits_list_page.dart';
 
 class TamirbanApp extends ConsumerStatefulWidget {
   const TamirbanApp({super.key});
@@ -69,14 +71,14 @@ class _TamirbanAppState extends ConsumerState<TamirbanApp> {
           path: AppRouter.dashboard,
           builder: (context, state) => const DashboardPlaceholderPage(),
         ),
-        // Placeholder routes for other pages
+        // Customers page
         GoRoute(
           path: AppRouter.customers,
-          builder: (context, state) => const _PlaceholderPage(title: 'مشتریان'),
+          builder: (context, state) => const CustomersListPage(),
         ),
         GoRoute(
           path: AppRouter.visits,
-          builder: (context, state) => const _PlaceholderPage(title: 'ویزیت‌ها'),
+          builder: (context, state) => const VisitsListPage(),
         ),
         GoRoute(
           path: AppRouter.invoices,

@@ -114,20 +114,29 @@
   - [x] نمایش Errorهای اعتبارسنجی از بک‌اند  
 
 ### 7. فاز ماژول Customers
-- [ ] **لیست مشتریان**  
-  - [ ] طراحی صفحه Customers مطابق `sample/handoff/static-ui/customers.html` و Next.js `components/customers/*`  
-  - [ ] اتصال به `GET /api/customers` با فیلترها و pagination  
-  - [ ] نمایش ستون‌ها: شناسه، نام، بازاریاب، شهر، آخرین ویزیت، وضعیت، امتیاز، درآمد ماه جاری  
-  - [ ] پیاده‌سازی Pagination (دکمه‌های قبلی/بعدی + نمایش صفحه فعلی)  
-- [ ] **فیلتر و جستجو**  
-  - [ ] فیلتر وضعیت، شهر، بازاریاب (در صورت نیاز Searchable Dropdown)  
-  - [ ] جستجوی زنده بر اساس نام/شماره  
-- [ ] **ایجاد/ویرایش/حذف مشتری**  
-  - [ ] فرم ایجاد مشتری (Modal/Page) مطابق `customer-create-form.tsx` با اعتبارسنجی سمت کلاینت  
-  - [ ] اتصال به `POST /api/customers`، `PATCH /api/customers/{id}`, `DELETE /api/customers/{id}`  
-  - [ ] نمایش Toast برای موفقیت/خطا و به‌روزرسانی لیست پس از عملیات  
-- [ ] **حالت‌های خالی، Loading، Error**  
-  - [ ] پیاده‌سازی Empty State و Skeleton مطابق قوانین `ui-style-guide.md`  
+- [x] **لیست مشتریان**  
+  - [x] طراحی صفحه Customers مطابق `sample/handoff/static-ui/customers.html` و Next.js `components/customers/*`  
+  - [x] اتصال به `GET /api/customers` با فیلترها و pagination (با پشتیبانی از Offline Mode با Mock Data)  
+  - [x] نمایش کارت‌ها: شناسه، نام، بازاریاب، شهر، آخرین ویزیت، وضعیت، امتیاز، درآمد ماه جاری  
+  - [x] پیاده‌سازی Pagination (دکمه‌های قبلی/بعدی + نمایش صفحه فعلی)  
+- [x] **فیلتر و جستجو**  
+  - [x] فیلتر وضعیت (با FilterChip)  
+  - [x] جستجوی زنده بر اساس نام/کد/شهر  
+  - [ ] فیلتر شهر (در صورت نیاز)  
+  - [ ] فیلتر بازاریاب (در صورت نیاز Searchable Dropdown)  
+- [x] **ایجاد/ویرایش/حذف مشتری**  
+  - [x] فرم ایجاد مشتری (Modal) با `CustomerForm` و `AppModal` با اعتبارسنجی سمت کلاینت  
+  - [x] فرم ویرایش مشتری (Modal) با دریافت جزئیات مشتری و نمایش در `CustomerForm`  
+  - [x] اتصال به `POST /api/customers`، `PATCH /api/customers/{id}`, `DELETE /api/customers/{id}`  
+  - [x] دکمه‌های ویرایش و حذف در کارت مشتری  
+  - [x] نمایش SnackBar برای موفقیت/خطا و به‌روزرسانی لیست پس از عملیات  
+- [x] **حالت‌های خالی، Loading، Error**  
+  - [x] پیاده‌سازی Empty State  
+  - [x] پیاده‌سازی Loading State  
+  - [x] پیاده‌سازی Error State  
+  - [ ] Skeleton (بعداً در صورت نیاز)
+- [ ] **صفحه جزئیات مشتری**  
+  - [ ] طراحی صفحه جزئیات مشتری با نمایش تمام اطلاعات  
 
 ### 8. فاز ماژول Visits
 - [ ] **لیست ویزیت‌ها و داشبورد ساده**  
@@ -141,13 +150,15 @@
 - [ ] **راه‌اندازی نقشه Neshan Map برای Visits**  
   - [x] دریافت فایل License از پنل Neshan (`assets/licenses/neshan.license`) - مرجع: `NESHAN_LICENSE_SETUP.md`
   - [x] افزودن فایل License به `pubspec.yaml` در بخش assets
-  - [ ] دریافت API Key از پنل Neshan (در صورت نیاز) - راهنما: `HOW_TO_GET_NESHAN_API_KEY.md`
-  - [ ] نصب کتابخانه Neshan Map SDK در `pubspec.yaml` (پکیج: `neshanmap_flutter` یا `neshan_map_sdk`)
-  - [ ] افزودن Maven Repository Neshan به `android/build.gradle.kts` (مرجع: `flutter-implementation-guide.md` خطوط 259-273)
-  - [ ] تنظیم Permission ها در `AndroidManifest.xml` (INTERNET, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION) - مرجع: `flutter-implementation-guide.md` خطوط 296-313
-  - [ ] افزودن API Key به `AndroidManifest.xml` در صورت نیاز (meta-data `neshan_api_key`) - مرجع: `flutter-implementation-guide.md` خطوط 277-292
+  - [x] افزودن Maven Repository Neshan به `android/build.gradle.kts` - مرجع: `flutter-implementation-guide.md` خطوط 259-273
+  - [x] تنظیم Permission ها در `AndroidManifest.xml` (INTERNET, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION) - مرجع: `flutter-implementation-guide.md` خطوط 296-313
+  - [x] آماده‌سازی `AndroidManifest.xml` برای API Key (کامنت TODO اضافه شده)
+  - [ ] دریافت API Key از پنل Neshan با Bundle Name جدید (`ir.tamirban.app`) - راهنما: `NESHAN_FORM_VALUES.md`
+  - [x] آماده‌سازی برای نصب کتابخانه Neshan Map SDK (کامنت در pubspec.yaml - نیاز به SDK >=3.9.0)
+  - [x] ایجاد کامپوننت اولیه نقشه (`lib/features/visits/widgets/neshan_map_widget.dart`)
+  - [ ] افزودن API Key به `AndroidManifest.xml` (meta-data `neshan_api_key`) - مرجع: `flutter-implementation-guide.md` خطوط 277-292
   - [ ] بارگذاری فایل License در کد Flutter (استفاده از `rootBundle.loadString()`)
-  - [ ] طراحی وایرفریم اولیه کامپوننت نقشه (`lib/features/visits/widgets/neshan_map_widget.dart`)
+  - [x] طراحی وایرفریم اولیه کامپوننت نقشه (`lib/features/visits/widgets/neshan_map_widget.dart`) - کامل با مدل‌های `MapCoordinates` و `MapMarker`
   - [ ] پیاده‌سازی نمایش نقاط ویزیت روی نقشه (Markers)
   - [ ] پیاده‌سازی انتخاب لوکیشن برای ویزیت جدید (مرجع: `sample/components/visits/neshan-map.tsx`)
   - [ ] Reverse Geocoding: تبدیل مختصات به آدرس فارسی (مرجع: `flutter-implementation-guide.md` خطوط 366-395)
@@ -199,9 +210,14 @@
   - [ ] در صورت نیاز، فقط مشاهده نقش و دسترسی‌ها (مدیریت نقش‌ها معمولاً فقط در وب)  
 
 ### 13. فاز کامپوننت‌های مشترک UI در Flutter
-- [ ] **سیستم دکمه (Buttons)** مطابق `ui-style-guide.md`  
-  - [ ] پیاده‌سازی `Primary`, `Secondary`, `Ghost`, `Danger` با سایزهای `sm`, `md`, `lg`  
-  - [ ] وضعیت‌های `loading`, `disabled` و پشتیبانی از آیکون  
+- [x] **ایجاد کامپوننت Button مشترک**
+  - [x] پیاده‌سازی `AppButton` با 4 variant: Primary, Secondary, Ghost, Danger
+  - [x] پشتیبانی از 3 سایز: sm, md, lg
+  - [x] پشتیبانی از Loading state با CircularProgressIndicator
+  - [x] پشتیبانی از Left/Right Icons
+  - [x] پشتیبانی از Full Width
+  - [x] ایجاد فایل export: `lib/widgets/common/common_widgets.dart`
+  - مرجع: `sample/components/common/button.tsx`, `sample/docs/ui-style-guide.md`
 - [ ] **ورودی‌ها (Inputs)**  
   - [ ] TextField استاندارد با Label، HelperText، ErrorText  
   - [ ] ورودی شماره موبایل، مبلغ (با فرمت ریالی)، تاریخ شمسی  
@@ -255,10 +271,23 @@
 - Refactoring Navigation: استفاده از GoRouter `redirect` به جای AuthGuard widget wrapper
 - استفاده از `ApiException.fromDioError()` در `AuthRepository` - حذف `AuthException` و استفاده کامل از `ApiException`
 - تغییر Package Name از `com.example.tamirban1android` به `ir.tamirban.app` - تغییر در Android, iOS, macOS و جابجایی `MainActivity.kt`
+- راه‌اندازی اولیه Neshan Map SDK: Permissionها، Maven Repository، و کامپوننت اولیه نقشه (`lib/features/visits/widgets/neshan_map_widget.dart`)
+- **پیاده‌سازی کامل ماژول Customers:**
+  - ایجاد Models کامل (`Customer`, `CustomerSummary`, `ContactInfo`, `GeoLocation`, `CustomerStatus`, `PaginatedList`)
+  - ایجاد `CustomersRepository` با تمام عملیات CRUD
+  - ایجاد `CustomersListPage` با فیلتر، جستجو، pagination، و نمایش کارت‌ها
+  - ایجاد `CustomerForm` برای ایجاد/ویرایش مشتری با استفاده از `AppTextField` و `AppModal`
+  - پیاده‌سازی دکمه‌های ویرایش و حذف در کارت مشتری
+  - پشتیبانی از Offline Mode با Mock Data برای Customers
+- **ایجاد کامپوننت‌های مشترک UI:**
+  - `AppButton` (Primary, Secondary, Ghost, Danger) - ✅ کامل
+  - `AppTextField`, `AppPhoneField`, `AppAmountField` - ✅ کامل
+  - `AppModal` - ✅ کامل
 
 ⚠️ **کارهای باقی‌مانده با اولویت بالا:**
-- نصب و راه‌اندازی Neshan Map SDK (اکنون می‌توان با Package Name جدید شروع کرد)
-- به‌روزرسانی Bundle Name در پنل Neshan با Package Name جدید (`ir.tamirban.app`) اگر API Key قبلاً ساخته شده باشد
+- به‌روزرسانی Flutter SDK از 3.8.1 به >=3.9.0 (برای نصب `neshanmap_flutter`)
+- دریافت API Key از پنل Neshan با Bundle Name جدید (`ir.tamirban.app`)
+- نصب پکیج `neshanmap_flutter` بعد از به‌روزرسانی SDK
 - افزودن فونت ایران یکان (اگر فایل‌ها موجود است)
 
 - [x] **پیاده‌سازی ApiErrorCode و بهبود Error Handling**
@@ -308,8 +337,14 @@
   - [x] دریافت فایل License از پنل Neshan
   - [x] قرار دادن License در `assets/licenses/neshan.license`
   - [x] افزودن به `pubspec.yaml`
-  - [ ] نصب کتابخانه Neshan Map SDK
-  - [ ] تنظیم AndroidManifest.xml
+  - [x] افزودن Permission ها به `AndroidManifest.xml` (INTERNET, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
+  - [x] افزودن Maven Repository Neshan به `android/build.gradle.kts`
+  - [x] اضافه کردن کامنت برای API Key در `AndroidManifest.xml` (برای بعد)
+  - [x] آماده‌سازی برای نصب کتابخانه Neshan Map SDK (کامنت در pubspec.yaml - نیاز به SDK >=3.9.0)
+  - [x] ایجاد کامپوننت اولیه نقشه (`lib/features/visits/widgets/neshan_map_widget.dart`)
+  - [ ] دریافت API Key از پنل Neshan با Bundle Name جدید (`ir.tamirban.app`)
+  - [ ] اضافه کردن API Key به `AndroidManifest.xml`
+  - [ ] بارگذاری فایل License در کد Flutter
   - مرجع: `NESHAN_LICENSE_SETUP.md`, `flutter-implementation-guide.md` بخش "🗺️ اتصال به نقشه نشان"
 
 - [x] **بهبود Error Handling در Repositoryها**
@@ -333,10 +368,12 @@
 ### مستندات پروژه:
 - **راهنمای پیاده‌سازی Flutter:** `flutter-implementation-guide.md` - شامل راهنمای OTP Login، Neshan Map، و API Endpoints
 - **گزارش وضعیت پروژه:** `PROJECT_STATUS_REPORT.md` - خلاصه کامل کارهای انجام شده و باقی‌مانده
+- **گزارش وضعیت فعلی:** `CURRENT_PROJECT_STATUS.md` - گزارش جامع وضعیت فعلی پروژه (2025-01-28)
 - **راهنمای Neshan Map:** 
+  - `NESHAN_SETUP_STATUS.md` - وضعیت راه‌اندازی Neshan Map SDK
   - `NESHAN_LICENSE_SETUP.md` - راهنمای استفاده از License File
   - `NESHAN_MAP_SETUP_GUIDE.md` - راهنمای کامل راه‌اندازی Neshan Map
-  - `NESHAN_FORM_VALUES.md` - مقادیر دقیق برای فرم Neshan
+  - `NESHAN_FORM_VALUES.md` - مقادیر دقیق برای فرم Neshan (به‌روزرسانی شده با Bundle Name جدید)
 
 ### مستندات وب‌اپ (مرجع):
 - **API Reference:** `sample/handoff/api/api-reference.md`

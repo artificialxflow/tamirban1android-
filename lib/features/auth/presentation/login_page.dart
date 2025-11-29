@@ -11,6 +11,7 @@ import '../../../data/auth/auth_repository.dart';
 import '../../../data/auth/models/auth_tokens.dart';
 import '../../../data/auth/models/user.dart';
 import '../providers/auth_provider.dart';
+import '../../../widgets/common/common_widgets.dart';
 
 class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key});
@@ -549,9 +550,12 @@ class _RequestOtpCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        FilledButton(
+        AppButton(
           onPressed: isLoading ? null : onSubmit,
-          child: Text(isLoading ? 'در حال پردازش...' : 'دریافت کد تایید'),
+          isLoading: isLoading,
+          loadingText: 'در حال پردازش...',
+          fullWidth: true,
+          child: const Text('دریافت کد تایید'),
         ),
         const SizedBox(height: 8),
         Text(
@@ -674,16 +678,21 @@ class _VerifyOtpCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            TextButton(
+            AppButton(
               onPressed: isLoading ? null : onResend,
+              variant: ButtonVariant.ghost,
+              size: ButtonSize.sm,
               child: const Text('ارسال مجدد کد'),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        FilledButton(
+        AppButton(
           onPressed: isLoading ? null : onSubmit,
-          child: Text(isLoading ? 'در حال پردازش...' : 'ورود به داشبورد'),
+          isLoading: isLoading,
+          loadingText: 'در حال پردازش...',
+          fullWidth: true,
+          child: const Text('ورود به داشبورد'),
         ),
         const SizedBox(height: 8),
         Text(
