@@ -4,11 +4,19 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'core/navigation/app_router.dart';
+import 'core/navigation/back_button_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/login_page.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/customers/presentation/pages/customers_list_page.dart';
-import 'features/dashboard/presentation/pages/dashboard_placeholder.dart';
+import 'features/dashboard/presentation/pages/dashboard_page.dart';
+import 'features/invoices/presentation/pages/invoice_detail_page.dart';
+import 'features/invoices/presentation/pages/invoices_list_page.dart';
+import 'features/marketers/presentation/pages/marketers_list_page.dart';
+import 'features/reports/presentation/pages/reports_page.dart';
+import 'features/settings/presentation/pages/settings_page.dart';
+import 'features/sms/presentation/pages/sms_page.dart';
+import 'features/visits/presentation/pages/visit_detail_page.dart';
 import 'features/visits/presentation/pages/visits_list_page.dart';
 
 class TamirbanApp extends ConsumerStatefulWidget {
@@ -69,7 +77,7 @@ class _TamirbanAppState extends ConsumerState<TamirbanApp> {
         ),
         GoRoute(
           path: AppRouter.dashboard,
-          builder: (context, state) => const DashboardPlaceholderPage(),
+          builder: (context, state) => const DashboardPage(),
         ),
         // Customers page
         GoRoute(
@@ -81,24 +89,38 @@ class _TamirbanAppState extends ConsumerState<TamirbanApp> {
           builder: (context, state) => const VisitsListPage(),
         ),
         GoRoute(
+          path: '/visits/:visitId',
+          builder: (context, state) {
+            final visitId = state.pathParameters['visitId'] ?? '';
+            return VisitDetailPage(visitId: visitId);
+          },
+        ),
+        GoRoute(
           path: AppRouter.invoices,
-          builder: (context, state) => const _PlaceholderPage(title: 'پیش‌فاکتورها'),
+          builder: (context, state) => const InvoicesListPage(),
+        ),
+        GoRoute(
+          path: '/invoices/:invoiceId',
+          builder: (context, state) {
+            final invoiceId = state.pathParameters['invoiceId'] ?? '';
+            return InvoiceDetailPage(invoiceId: invoiceId);
+          },
         ),
         GoRoute(
           path: AppRouter.marketers,
-          builder: (context, state) => const _PlaceholderPage(title: 'بازاریاب‌ها'),
+          builder: (context, state) => const MarketersListPage(),
         ),
         GoRoute(
           path: AppRouter.sms,
-          builder: (context, state) => const _PlaceholderPage(title: 'پیامک‌ها'),
+          builder: (context, state) => const SmsPage(),
         ),
         GoRoute(
           path: AppRouter.reports,
-          builder: (context, state) => const _PlaceholderPage(title: 'گزارش‌ها'),
+          builder: (context, state) => const ReportsPage(),
         ),
         GoRoute(
           path: AppRouter.settings,
-          builder: (context, state) => const _PlaceholderPage(title: 'تنظیمات'),
+          builder: (context, state) => const SettingsPage(),
         ),
       ],
     );
@@ -126,9 +148,11 @@ class _TamirbanAppState extends ConsumerState<TamirbanApp> {
       theme: AppTheme.light(),
       routerConfig: _router,
       builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: child ?? const SizedBox.shrink(),
+        return BackButtonHandler(
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );

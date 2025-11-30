@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/navigation/app_router.dart';
+import '../../../core/navigation/app_router.dart';
 import '../providers/auth_provider.dart';
 
 /// Widget that guards routes requiring authentication

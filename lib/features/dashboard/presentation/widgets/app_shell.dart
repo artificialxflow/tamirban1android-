@@ -26,10 +26,22 @@ class AppShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
+    final currentRoute = GoRouterState.of(context).uri.path;
+    final isDashboard = currentRoute == AppRouter.dashboard;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(title),
+        leading: isDashboard
+            ? null // در Dashboard، drawer icon نمایش داده می‌شود
+            : IconButton(
+                icon: const Icon(Icons.home),
+                tooltip: 'بازگشت به خانه',
+                onPressed: () {
+                  context.go(AppRouter.dashboard);
+                },
+              ),
         actions: [
           if (authState.user != null)
             Padding(
@@ -156,7 +168,7 @@ class _AppDrawer extends ConsumerWidget {
             // Navigation items
             Expanded(
               child: ListView(
-                padding: EdgeInsets.zero,
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   _NavItem(
                     icon: Icons.dashboard,
@@ -169,20 +181,21 @@ class _AppDrawer extends ConsumerWidget {
                     route: AppRouter.customers,
                   ),
                   _NavItem(
-                    icon: Icons.business_center,
+                    icon: Icons.badge,
                     title: 'بازاریاب‌ها',
                     route: AppRouter.marketers,
                   ),
                   _NavItem(
-                    icon: Icons.calendar_today,
+                    icon: Icons.event,
                     title: 'ویزیت‌ها',
                     route: AppRouter.visits,
                   ),
                   _NavItem(
-                    icon: Icons.receipt,
+                    icon: Icons.receipt_long,
                     title: 'پیش‌فاکتورها',
                     route: AppRouter.invoices,
                   ),
+                  const Divider(height: 32),
                   _NavItem(
                     icon: Icons.sms,
                     title: 'پیامک‌ها',
@@ -193,7 +206,7 @@ class _AppDrawer extends ConsumerWidget {
                     title: 'گزارش‌ها',
                     route: AppRouter.reports,
                   ),
-                  const Divider(),
+                  const Divider(height: 32),
                   _NavItem(
                     icon: Icons.settings,
                     title: 'تنظیمات',
@@ -323,11 +336,13 @@ class _NavItem extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.route,
+    this.disabled = false,
   });
 
   final IconData icon;
   final String title;
   final String route;
+  final bool disabled;
 
   @override
   Widget build(BuildContext context) {
@@ -335,25 +350,66 @@ class _NavItem extends StatelessWidget {
     final isActive = location == route;
 
     return ListTile(
-      leading: Icon(
-        icon,
-                  color: isActive
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isActive
+              ? AppColors.primary.withValues(alpha: 0.15)
+              : AppColors.textSecondary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          color: disabled
+              ? AppColors.textSecondary.withValues(alpha: 0.5)
+              : isActive
+                  ? AppColors.primary
+                  : AppColors.textSecondary,
+          size: 20,
+        ),
       ),
       title: Text(
         title,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-              color: isActive ? AppColors.primary : AppColors.textPrimary,
+              color: disabled
+                  ? AppColors.textSecondary.withValues(alpha: 0.5)
+                  : isActive
+                      ? AppColors.primary
+                      : AppColors.textPrimary,
             ),
       ),
+      trailing: disabled
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.textSecondary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                'به زودی',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 10,
+                    ),
+              ),
+            )
+          : isActive
+              ? Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: AppColors.primary,
+                )
+              : null,
       selected: isActive,
-      selectedTileColor: AppColors.primary.withValues(alpha: 0.1),
-      onTap: () {
-        Navigator.of(context).pop(); // Close drawer
-        context.go(route);
-      },
+      selectedTileColor: AppColors.primary.withValues(alpha: 0.05),
+      enabled: !disabled,
+      onTap: disabled
+          ? null
+          : () {
+              Navigator.of(context).pop(); // Close drawer
+              context.go(route);
+            },
     );
   }
 }

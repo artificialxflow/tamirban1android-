@@ -7,7 +7,9 @@ class AppRouter {
   static const String dashboard = '/dashboard';
   static const String customers = '/customers';
   static const String visits = '/visits';
+  static String visitDetail(String visitId) => '/visits/$visitId';
   static const String invoices = '/invoices';
+  static String invoiceDetail(String invoiceId) => '/invoices/$invoiceId';
   static const String marketers = '/marketers';
   static const String sms = '/sms';
   static const String reports = '/reports';

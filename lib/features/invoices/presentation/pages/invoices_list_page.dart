@@ -1,51 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 
 import '../../../../core/config/app_environment.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/errors/api_error.dart';
 import '../../../../core/navigation/app_router.dart';
-import '../../../../data/visits/models/visit_status.dart';
-import '../../../../data/visits/models/visit_summary.dart';
+import '../../../../data/invoices/models/invoice_status.dart';
+import '../../../../data/invoices/models/invoice_summary.dart';
 import '../../../../widgets/common/app_button.dart';
 import '../../../../widgets/common/app_modal.dart';
 import '../../../dashboard/presentation/widgets/app_shell.dart';
-import '../../providers/visit_list_filters.dart';
-import '../../providers/visits_provider.dart';
-import '../widgets/visit_form.dart';
+import '../../providers/invoices_provider.dart';
+import '../widgets/invoice_form.dart';
 import 'package:go_router/go_router.dart';
 
-/// صفحه لیست ویزیت‌ها
-class VisitsListPage extends ConsumerStatefulWidget {
-  const VisitsListPage({super.key});
+/// صفحه لیست پیش‌فاکتورها
+class InvoicesListPage extends ConsumerStatefulWidget {
+  const InvoicesListPage({super.key});
 
   @override
-  ConsumerState<VisitsListPage> createState() => _VisitsListPageState();
+  ConsumerState<InvoicesListPage> createState() => _InvoicesListPageState();
 }
 
-class _VisitsListPageState extends ConsumerState<VisitsListPage> {
-  VisitStatus? _selectedStatus;
+class _InvoicesListPageState extends ConsumerState<InvoicesListPage> {
+  InvoiceStatus? _selectedStatus;
 
   @override
   Widget build(BuildContext context) {
-    final filters = ref.watch(visitListFiltersProvider);
-    final visitsAsync = ref.watch(visitsListProvider(filters));
+    final filters = ref.watch(invoiceListFiltersProvider);
+    final invoicesAsync = ref.watch(invoicesListProvider(filters));
 
     return AppShell(
-      title: 'ویزیت‌ها',
+      title: 'پیش‌فاکتورها',
       actions: [
         AppButton(
           onPressed: () {
             AppModal.show(
               context: context,
-              title: 'ویزیت جدید',
-              child: VisitForm(
+              title: 'پیش‌فاکتور جدید',
+              child: InvoiceForm(
                 onSuccess: () {
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('ویزیت با موفقیت ثبت شد'),
+                      content: Text('پیش‌فاکتور با موفقیت ثبت شد'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -55,7 +55,7 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
             );
           },
           leftIcon: const Icon(Icons.add, size: 20),
-          child: const Text('ویزیت جدید'),
+          child: const Text('پیش‌فاکتور جدید'),
         ),
       ],
       child: Column(
@@ -87,7 +87,7 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      ...VisitStatus.values.map((status) {
+                      ...InvoiceStatus.values.map((status) {
                         return Padding(
                           padding: const EdgeInsets.only(left: 8),
                           child: FilterChip(
@@ -109,26 +109,26 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
             ),
           ),
 
-          // لیست ویزیت‌ها
+          // لیست پیش‌فاکتورها
           Expanded(
-            child: visitsAsync.when(
+            child: invoicesAsync.when(
               data: (paginatedList) {
-                final visits = paginatedList.data;
+                final invoices = paginatedList.data;
                 final pagination = paginatedList.pagination;
 
-                if (visits.isEmpty) {
+                if (invoices.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.event_note_outlined,
+                          Icons.receipt_long_outlined,
                           size: 64,
                           color: AppColors.textSecondary,
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'ویزیتی یافت نشد',
+                          'پیش‌فاکتوری یافت نشد',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -140,18 +140,18 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
 
                 return RefreshIndicator(
                   onRefresh: () async {
-                    ref.invalidate(visitsListProvider(filters));
+                    ref.invalidate(invoicesListProvider(filters));
                   },
                   child: Column(
                     children: [
                       Expanded(
                         child: ListView.separated(
                           padding: const EdgeInsets.all(16),
-                          itemCount: visits.length,
+                          itemCount: invoices.length,
                           separatorBuilder: (context, index) => const SizedBox(height: 12),
                           itemBuilder: (context, index) {
-                            final visit = visits[index];
-                            return _VisitCard(visit: visit);
+                            final invoice = invoices[index];
+                            return _InvoiceCard(invoice: invoice);
                           },
                         ),
                       ),
@@ -168,7 +168,7 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'نمایش ${visits.length} از ${pagination.total}',
+                              'نمایش ${invoices.length} از ${pagination.total}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             Row(
@@ -177,7 +177,7 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
                                   TextButton(
                                     onPressed: () {
                                       final newFilters = filters.copyWith(page: pagination.page - 1);
-                                      ref.read(visitListFiltersProvider.notifier).state = newFilters;
+                                      ref.read(invoiceListFiltersProvider.notifier).state = newFilters;
                                     },
                                     child: const Text('قبلی'),
                                   ),
@@ -187,7 +187,7 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
                                   TextButton(
                                     onPressed: () {
                                       final newFilters = filters.copyWith(page: pagination.page + 1);
-                                      ref.read(visitListFiltersProvider.notifier).state = newFilters;
+                                      ref.read(invoiceListFiltersProvider.notifier).state = newFilters;
                                     },
                                     child: const Text('بعدی'),
                                   ),
@@ -202,7 +202,7 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
               },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) {
-                String message = 'خطا در دریافت لیست ویزیت‌ها';
+                String message = 'خطا در دریافت لیست پیش‌فاکتورها';
                 if (error is ApiException) {
                   message = error.message;
                 }
@@ -227,7 +227,7 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
-                          ref.invalidate(visitsListProvider(filters));
+                          ref.invalidate(invoicesListProvider(filters));
                         },
                         child: const Text('تلاش مجدد'),
                       ),
@@ -243,103 +243,37 @@ class _VisitsListPageState extends ConsumerState<VisitsListPage> {
   }
 
   void _updateFilters() {
-    final filters = VisitListFilters(
+    final filters = InvoiceListFilters(
       status: _selectedStatus,
       page: 1,
       limit: 20,
     );
-    ref.read(visitListFiltersProvider.notifier).state = filters;
+    ref.read(invoiceListFiltersProvider.notifier).state = filters;
   }
 }
 
-/// کارت نمایش ویزیت
-class _VisitCard extends ConsumerStatefulWidget {
-  const _VisitCard({required this.visit});
+/// کارت نمایش پیش‌فاکتور
+class _InvoiceCard extends ConsumerStatefulWidget {
+  const _InvoiceCard({required this.invoice});
 
-  final VisitSummary visit;
+  final InvoiceSummary invoice;
 
   @override
-  ConsumerState<_VisitCard> createState() => _VisitCardState();
+  ConsumerState<_InvoiceCard> createState() => _InvoiceCardState();
 }
 
-class _VisitCardState extends ConsumerState<_VisitCard> {
-  bool _isLoading = false;
+class _InvoiceCardState extends ConsumerState<_InvoiceCard> {
   bool _isDeleting = false;
 
-  String _formatDateTime(DateTime dateTime) {
-    final dateFormat = DateFormat('yyyy/MM/dd', 'fa');
-    final timeFormat = DateFormat('HH:mm', 'fa');
-    return '${dateFormat.format(dateTime)} ${timeFormat.format(dateTime)}';
-  }
-
-  Color _getStatusColor(VisitStatus status) {
-    switch (status) {
-      case VisitStatus.scheduled:
-        return AppColors.primary;
-      case VisitStatus.inProgress:
-        return AppColors.warning;
-      case VisitStatus.completed:
-        return AppColors.accent;
-      case VisitStatus.cancelled:
-        return AppColors.danger;
-    }
-  }
-
-  Future<void> _handleEdit(BuildContext context) async {
-    if (_isLoading || _isDeleting) return;
-    
-    setState(() => _isLoading = true);
-    
-    try {
-      final repo = ref.read(visitsRepositoryProvider);
-      final visit = await repo.getVisit(widget.visit.id);
-      
-      if (!mounted) return;
-      
-      AppModal.show(
-        context: context,
-        title: 'ویرایش ویزیت',
-        child: VisitForm(
-          visit: visit,
-          onSuccess: () {
-            Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('ویزیت با موفقیت به‌روزرسانی شد'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            // Refresh list
-            final filters = ref.read(visitListFiltersProvider);
-            ref.invalidate(visitsListProvider(filters));
-          },
-          onCancel: () => Navigator.of(context).pop(),
-        ),
-      );
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('خطا در دریافت جزئیات ویزیت: ${error is ApiException ? error.message : 'خطای ناشناخته'}'),
-          backgroundColor: AppColors.danger,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
   Future<void> _handleDelete(BuildContext context) async {
-    if (_isDeleting || _isLoading) return;
+    if (_isDeleting) return;
     
     // Confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('حذف ویزیت'),
-        content: const Text('آیا از حذف این ویزیت اطمینان دارید؟'),
+        title: const Text('حذف پیش‌فاکتور'),
+        content: const Text('آیا از حذف این پیش‌فاکتور اطمینان دارید؟'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -359,26 +293,26 @@ class _VisitCardState extends ConsumerState<_VisitCard> {
     setState(() => _isDeleting = true);
     
     try {
-      final repo = ref.read(visitsRepositoryProvider);
-      await repo.deleteVisit(widget.visit.id);
+      final repo = ref.read(invoicesRepositoryProvider);
+      await repo.deleteInvoice(widget.invoice.id);
       
       if (!mounted) return;
       
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('ویزیت با موفقیت حذف شد'),
+          content: Text('پیش‌فاکتور با موفقیت حذف شد'),
           backgroundColor: Colors.green,
         ),
       );
       
       // Refresh list
-      final filters = ref.read(visitListFiltersProvider);
-      ref.invalidate(visitsListProvider(filters));
+      final filters = ref.read(invoiceListFiltersProvider);
+      ref.invalidate(invoicesListProvider(filters));
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('خطا در حذف ویزیت: ${error is ApiException ? error.message : 'خطای ناشناخته'}'),
+          content: Text('خطا در حذف پیش‌فاکتور: ${error is ApiException ? error.message : 'خطای ناشناخته'}'),
           backgroundColor: AppColors.danger,
         ),
       );
@@ -386,6 +320,30 @@ class _VisitCardState extends ConsumerState<_VisitCard> {
       if (mounted) {
         setState(() => _isDeleting = false);
       }
+    }
+  }
+
+  String _formatPersianDate(DateTime dateTime) {
+    final jalali = Jalali.fromDateTime(dateTime);
+    return '${jalali.year}/${jalali.month.toString().padLeft(2, '0')}/${jalali.day.toString().padLeft(2, '0')}';
+  }
+
+  String _formatCurrency(double amount) {
+    return NumberFormat('#,###', 'fa').format(amount);
+  }
+
+  Color _getStatusColor(InvoiceStatus status) {
+    switch (status) {
+      case InvoiceStatus.draft:
+        return AppColors.textSecondary;
+      case InvoiceStatus.sent:
+        return AppColors.primary;
+      case InvoiceStatus.paid:
+        return AppColors.accent;
+      case InvoiceStatus.overdue:
+        return AppColors.danger;
+      case InvoiceStatus.cancelled:
+        return AppColors.danger;
     }
   }
 
@@ -399,7 +357,7 @@ class _VisitCardState extends ConsumerState<_VisitCard> {
       ),
       child: InkWell(
         onTap: () {
-          context.push(AppRouter.visitDetail(widget.visit.id));
+          context.push('${AppRouter.invoices}/${widget.invoice.id}');
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -415,14 +373,14 @@ class _VisitCardState extends ConsumerState<_VisitCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.visit.customerName,
+                          widget.invoice.customerName,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _formatDateTime(widget.visit.scheduledAt),
+                          '${_formatPersianDate(widget.invoice.issuedAt)} - ${_formatPersianDate(widget.invoice.dueAt)}',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -430,74 +388,42 @@ class _VisitCardState extends ConsumerState<_VisitCard> {
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(widget.visit.status).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      widget.visit.status.displayName,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: _getStatusColor(widget.visit.status),
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(widget.invoice.status).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          widget.invoice.status.displayName,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: _getStatusColor(widget.invoice.status),
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${_formatCurrency(widget.invoice.grandTotal)} ${widget.invoice.currency}',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 16,
-                runSpacing: 8,
-                children: [
-                  if (widget.visit.marketerName != null)
-                    _InfoItem(
-                      icon: Icons.person,
-                      label: widget.visit.marketerName!,
-                    ),
-                  if (widget.visit.topics.isNotEmpty)
-                    _InfoItem(
-                      icon: Icons.topic,
-                      label: widget.visit.topics.join(', '),
-                    ),
-                  if (widget.visit.completedAt != null)
-                    _InfoItem(
-                      icon: Icons.check_circle,
-                      label: 'تکمیل شده: ${_formatDateTime(widget.visit.completedAt!)}',
-                    ),
-                ],
-              ),
-              if (widget.visit.notes != null && widget.visit.notes!.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Text(
-                  widget.visit.notes!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
               const SizedBox(height: 12),
               // Actions
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    onPressed: _isLoading || _isDeleting ? null : () => _handleEdit(context),
-                    icon: _isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.edit, size: 20),
-                    color: AppColors.primary,
-                    tooltip: 'ویرایش',
-                  ),
-                  IconButton(
-                    onPressed: _isLoading || _isDeleting ? null : () => _handleDelete(context),
+                    onPressed: _isDeleting ? null : () => _handleDelete(context),
                     icon: _isDeleting
                         ? const SizedBox(
                             width: 20,
@@ -518,29 +444,3 @@ class _VisitCardState extends ConsumerState<_VisitCard> {
   }
 }
 
-class _InfoItem extends StatelessWidget {
-  const _InfoItem({
-    required this.icon,
-    required this.label,
-  });
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16, color: AppColors.textSecondary),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-        ),
-      ],
-    );
-  }
-}

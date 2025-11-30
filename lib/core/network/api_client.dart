@@ -61,9 +61,14 @@ class ApiClient {
         onRequest: (options, handler) async {
           // Attach Authorization header if token is available.
           if (client.tokenProvider != null) {
-            final token = await client.tokenProvider!();
-            if (token != null && token.isNotEmpty) {
-              options.headers['Authorization'] = 'Bearer $token';
+            try {
+              final token = await client.tokenProvider!();
+              if (token != null && token.isNotEmpty) {
+                options.headers['Authorization'] = 'Bearer $token';
+              }
+            } catch (e) {
+              // If token reading fails, continue without token (will get 401)
+              // This should not happen, but handle gracefully
             }
           }
 

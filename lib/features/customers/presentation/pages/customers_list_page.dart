@@ -57,37 +57,6 @@ class _CustomersListPageState extends ConsumerState<CustomersListPage> {
       ],
       child: Column(
         children: [
-          // بنر حالت Offline/Mock
-          if (AppConfig.enableOfflineMode)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.accent.withValues(alpha: 0.1),
-                border: Border(
-                  bottom: BorderSide(color: AppColors.accent.withValues(alpha: 0.3)),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.wifi_off,
-                    size: 20,
-                    color: AppColors.accent,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'حالت تست: داده‌های نمونه نمایش داده می‌شوند',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.accent,
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           // فیلترها و جستجو
           Container(
             padding: const EdgeInsets.all(16),

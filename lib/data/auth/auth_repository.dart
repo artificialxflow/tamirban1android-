@@ -62,8 +62,23 @@ class AuthRepository {
 
       final data = apiResponse.data!;
       final user = User.fromJson(data['user'] as Map<String, dynamic>);
-      final tokens =
-          AuthTokens.fromJson(data['tokens'] as Map<String, dynamic>? ?? {});
+      
+      // Backend returns tokens directly in data (not in data['tokens'])
+      // Structure: { accessToken, refreshToken, expiresIn, refreshExpiresIn, user }
+      final tokens = AuthTokens(
+        accessToken: data['accessToken'] as String? ?? '',
+        refreshToken: data['refreshToken'] as String? ?? '',
+      );
+      
+      // Validate tokens are not empty
+      if (tokens.accessToken.isEmpty || tokens.refreshToken.isEmpty) {
+        throw ApiException(
+          'توکن‌های احراز هویت دریافت نشد',
+          statusCode: 500,
+          code: ApiErrorCode.internalServerError,
+        );
+      }
+      
       return (user, tokens);
     } catch (error) {
       if (error is ApiException) {
@@ -99,7 +114,13 @@ class AuthRepository {
         );
       }
 
-      return AuthTokens.fromJson(apiResponse.data!);
+      // Backend returns tokens directly in data
+      // Structure: { accessToken, refreshToken, expiresIn, refreshExpiresIn }
+      final data = apiResponse.data!;
+      return AuthTokens(
+        accessToken: data['accessToken'] as String? ?? '',
+        refreshToken: data['refreshToken'] as String? ?? '',
+      );
     } catch (error) {
       if (error is ApiException) {
         rethrow;

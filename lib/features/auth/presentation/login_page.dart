@@ -1,11 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/config/app_environment.dart';
 import '../../../core/errors/api_error.dart';
-import '../../dashboard/presentation/pages/dashboard_placeholder.dart';
+import '../../../core/navigation/app_router.dart';
 import '../../../core/di/providers.dart';
 import '../../../data/auth/auth_repository.dart';
 import '../../../data/auth/models/auth_tokens.dart';
@@ -96,25 +98,6 @@ class _LoginContentState extends State<_LoginContent> {
     return phone;
   }
 
-  /// Mock login برای حالت تست بدون backend
-  Future<void> _mockLogin(AuthNotifier authNotifier, String phone) async {
-    // ایجاد mock user
-    final mockUser = User(
-      id: 'test-user-${DateTime.now().millisecondsSinceEpoch}',
-      fullName: 'کاربر تست',
-      mobile: phone,
-      role: 'SUPER_ADMIN',
-      isActive: true,
-    );
-
-    // ایجاد mock tokens (برای تست)
-    final mockTokens = AuthTokens(
-      accessToken: 'mock-access-token-${DateTime.now().millisecondsSinceEpoch}',
-      refreshToken: 'mock-refresh-token-${DateTime.now().millisecondsSinceEpoch}',
-    );
-
-    await authNotifier.login(mockUser, mockTokens);
-  }
 
   Future<void> _handleRequestOtp(WidgetRef ref) async {
     if (_normalizedPhone.isEmpty) {
@@ -135,8 +118,12 @@ class _LoginContentState extends State<_LoginContent> {
     try {
       await repo.requestOtp(mobile: _normalizedPhone);
       setState(() {
-        _requestMessage =
-            'کد تایید به شماره موبایل شما ارسال شد. (در حالت تست: 0000)';
+        // فقط برای Web و فقط برای شماره 09126723365
+        if (kIsWeb && _normalizedPhone == '09126723365') {
+          _requestMessage = 'کد تایید به شماره موبایل شما ارسال شد. (کد تست: 0000)';
+        } else {
+          _requestMessage = 'کد تایید به شماره موبایل شما ارسال شد.';
+        }
       });
     } catch (error) {
       String errorMessage = 'ارسال کد ناموفق بود.';
@@ -147,9 +134,7 @@ class _LoginContentState extends State<_LoginContent> {
         if (error.code == ApiErrorCode.internalServerError &&
             (error.message.contains('Connection refused') ||
              error.message.contains('در دسترس نیست'))) {
-          if (AppConfig.enableOfflineMode) {
-            errorMessage = 'سرور در دسترس نیست. می‌توانید مستقیماً از کد تست 0000 برای ورود استفاده کنید.';
-          }
+          errorMessage = 'سرور در دسترس نیست. لطفاً اتصال اینترنت خود را بررسی کنید.';
         }
       } else {
         // Check for specific error types (fallback)
@@ -158,11 +143,7 @@ class _LoginContentState extends State<_LoginContent> {
             errorString.contains('connection refused') ||
             errorString.contains('connection') ||
             errorString.contains('network')) {
-          if (AppConfig.enableOfflineMode) {
-            errorMessage = 'سرور در دسترس نیست. می‌توانید مستقیماً از کد تست 0000 برای ورود استفاده کنید.';
-          } else {
-            errorMessage = 'سرور در دسترس نیست. لطفاً مطمئن شوید که backend در حال اجرا است.';
-          }
+          errorMessage = 'سرور در دسترس نیست. لطفاً اتصال اینترنت خود را بررسی کنید.';
         }
       }
       
@@ -207,15 +188,32 @@ class _LoginContentState extends State<_LoginContent> {
            final authNotifier = ref.read(authProvider.notifier);
 
            try {
-             // حالت تست: اگر offline mode فعال باشد و کد 0000 بود، مستقیماً mock login
-             if (AppConfig.enableOfflineMode && code == '0000') {
-               // مستقیماً mock login بدون چک کردن backend
-               await _mockLogin(authNotifier, _normalizedPhone);
+             // لاگین تست فقط برای Web و فقط با شماره 09126723365
+             final isTestLogin = kIsWeb && 
+                                 _normalizedPhone == '09126723365' && 
+                                 code == '0000';
+             
+             if (isTestLogin) {
+               // Mock login برای تست در Web
+               final mockUser = User(
+                 id: 'test-user-${DateTime.now().millisecondsSinceEpoch}',
+                 fullName: 'کاربر تست',
+                 mobile: _normalizedPhone,
+                 role: 'SUPER_ADMIN',
+                 isActive: true,
+               );
+               
+               final mockTokens = AuthTokens(
+                 accessToken: 'mock-access-token-${DateTime.now().millisecondsSinceEpoch}',
+                 refreshToken: 'mock-refresh-token-${DateTime.now().millisecondsSinceEpoch}',
+               );
+               
+               await authNotifier.login(mockUser, mockTokens);
              } else {
-               // حالت عادی: استفاده از backend
+               // استفاده از backend
                final (user, tokens) =
                    await repo.verifyOtp(mobile: _normalizedPhone, code: code);
-
+               
                await authNotifier.login(user, tokens);
              }
 
@@ -228,11 +226,9 @@ class _LoginContentState extends State<_LoginContent> {
              if (!mounted) return;
              await Future<void>.delayed(const Duration(milliseconds: 600));
              if (!mounted) return;
-             Navigator.of(context).pushReplacement(
-               MaterialPageRoute<void>(
-                 builder: (_) => const DashboardPlaceholderPage(),
-               ),
-             );
+             if (context.mounted) {
+               context.go(AppRouter.dashboard);
+             }
     } catch (error) {
       if (mounted) {
         String errorMessage = 'ورود ناموفق بود.';
@@ -298,16 +294,28 @@ class _LoginContentState extends State<_LoginContent> {
                                   ),
                         ),
                         const SizedBox(height: 12),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            _Chip('حالت تست: کد ثابت 0000'),
-                            _Chip('اعتبار کد: ۵ دقیقه'),
-                            _Chip('محدودیت تلاش: ۵ بار'),
-                          ],
-                        ),
+                        if (kIsWeb) ...[
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              _Chip('حالت تست: کد ثابت 0000 (فقط شماره 09126723365)'),
+                              _Chip('اعتبار کد: ۵ دقیقه'),
+                              _Chip('محدودیت تلاش: ۵ بار'),
+                            ],
+                          ),
+                        ] else ...[
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              _Chip('اعتبار کد: ۵ دقیقه'),
+                              _Chip('محدودیت تلاش: ۵ بار'),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -575,6 +583,7 @@ class _VerifyOtpCard extends StatelessWidget {
     required this.message,
     required this.onSubmit,
     required this.onResend,
+    this.showTestCode = false,
   });
 
   final String phone;
@@ -583,6 +592,7 @@ class _VerifyOtpCard extends StatelessWidget {
   final String? message;
   final VoidCallback onSubmit;
   final VoidCallback onResend;
+  final bool showTestCode;
 
   @override
   Widget build(BuildContext context) {
@@ -601,38 +611,6 @@ class _VerifyOtpCard extends StatelessWidget {
               : 'کد چهار رقمی ارسال‌شده را وارد کنید.',
           style: Theme.of(context).textTheme.bodySmall,
         ),
-        if (AppConfig.enableOfflineMode) ...[
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppColors.accent.withValues(alpha: 0.3),
-              ),
-              color: AppColors.accent.withValues(alpha: 0.1),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  size: 16,
-                  color: AppColors.accent,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'کد تست: 0000',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.accent,
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
         const SizedBox(height: 12),
         if (message != null) ...[
           Container(
@@ -670,14 +648,30 @@ class _VerifyOtpCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: Text(
-                'کد تست فعلی: 0000',
-                style: Theme.of(context).textTheme.bodySmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+            if (showTestCode)
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColors.accent.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Text(
+                    'کد تست: 0000',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.accent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              )
+            else
+              const Spacer(),
             AppButton(
               onPressed: isLoading ? null : onResend,
               variant: ButtonVariant.ghost,

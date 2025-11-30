@@ -1,8 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/config/app_environment.dart';
 import '../../../core/di/providers.dart';
-import '../../../core/errors/api_error.dart';
 import '../../../data/customers/models/paginated_list.dart';
 import '../../../data/visits/models/visit.dart';
 import '../../../data/visits/models/visit_summary.dart';
@@ -37,18 +35,6 @@ final visitsListProvider = FutureProvider.family<
       limit: filters.limit,
     );
   } catch (error) {
-    // اگر Offline Mode فعال باشد و خطای Connection باشد، داده‌های Mock استفاده کنیم
-    if (AppConfig.enableOfflineMode && error is ApiException) {
-      final apiError = error;
-      if (apiError.code == ApiErrorCode.internalServerError &&
-          (apiError.message.contains('Connection refused') ||
-           apiError.message.contains('در دسترس نیست') ||
-           apiError.message.contains('خطا در اتصال'))) {
-        // TODO: استفاده از Mock Data (بعداً اضافه می‌شود)
-        rethrow;
-      }
-    }
-    // در غیر این صورت، خطا را throw می‌کنیم
     rethrow;
   }
 });

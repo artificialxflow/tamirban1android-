@@ -18,7 +18,9 @@ class AppConfig {
   /// **Important:** 
   /// - Set to `false` for development (uses localhost:3124 - no CORS issues)
   /// - Set to `true` for production build (uses tamirban1.ir - may have CORS issues in web)
-  static const bool _forceProduction = false; // Set to true only for production build
+  /// 
+  /// **Note:** برای استفاده از API واقعی در Web، این مقدار را به `true` تغییر دهید
+  static const bool _forceProduction = true; // Set to true to use production API
 
   static AppEnvironment get current {
     if (_forceProduction) {
